@@ -8,4 +8,20 @@
     <!-- Label for overflow menu option that deletes all product data in the app [CHAR LIMIT=20] -->
     <string name="action_delete_all_entries">Delete All Products</string>
 
+    <!-- Text hint for product name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_product_name">Product Name</string>
+
+    <!-- Text hint for quantity field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_product_quantity">Quantity</string>
+
+    <!-- Text hint for price field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_price">Price</string>
+
+    <!-- Label for editor menu option to save product and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current product [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+
 </resources>
