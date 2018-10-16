@@ -51,9 +51,6 @@ public class InventoryActivity extends AppCompatActivity {
 
     private void displayDatabaseInfo() {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-
         String[] projection = {
                 ProductEntry._ID,
                 ProductEntry.COLUMN_PRODUCT_NAME,
@@ -61,11 +58,9 @@ public class InventoryActivity extends AppCompatActivity {
                 ProductEntry.COLUMN_PRODUCT_PRICE
         };
 
-        Cursor cursor = db.query(
-                ProductEntry.TABLE_NAME,
+        Cursor cursor = getContentResolver().query(
+                ProductEntry.CONTENT_URI,
                 projection,
-                null,
-                null,
                 null,
                 null,
                 null);
