@@ -20,6 +20,10 @@
             android:label="Edit Product">
 
         </activity>
+        <provider
+            android:name=".data.ProductProvider"
+            android:authorities="com.android.inventory"
+            android:exported="false" />
     </application>
 
 </manifest>
