@@ -136,13 +136,98 @@ public class ProductProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
+    /**
+     * Delete the data at the given selection and selection arguments.
+     */
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+
+        // Track the number of rows that were deleted
+        int rowsDeleted;
+
+        // Get write-able database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                // Delete all rows that match the selection and selection args
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+
+                // If 1 or more rows were deleted, then notify all listeners that the data at the
+                // given URI has changed
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsDeleted;
+            case PRODUCT_ID:
+                // Delete a single row given by the ID in the URI
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+
+                // If 1 or more rows were deleted, then notify all listeners that the data at the
+                // given URI has changed
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsDeleted;
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+
+
+        }
+
     }
 
+    /**
+     * Updates the data at the given selection and selection arguments, with the new ContentValues.
+     */
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+            case PRODUCT_ID:
+                // For the PRODUCT_ID code, extract out the ID from the URI,
+                // so we know which row to update. Selection will be "_id=?" and selection
+                // arguments will be a String array containing the actual ID.
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+
+    }
+
+    /**
+     * Update products in the database with the given content values. Apply the changes to the rows
+     * specified in the selection and selection arguments (which could be 0 or 1 or more pets).
+     * Return the number of rows that were successfully updated.
+     */
+    private int updateProduct(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+
+        // If there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+
+        // Otherwise, get write-able database to update the data
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Perform the update on the database and get the number of rows affected
+        int rowsUpdated = database.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
+
+
+
+        // Return the number of rows updated
+        return rowsUpdated;
+
     }
 }
