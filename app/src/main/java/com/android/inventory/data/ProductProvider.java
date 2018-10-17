@@ -90,6 +90,11 @@ public class ProductProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
 
+        // Set notification URI on the Cursor,
+        // so we know what content URI the Cursor was created for.
+        // If the data at this URI changes, then we know we need to update the Cursor.
+        cursor.setNotificationUri(getContext().getContentResolver(),uri);
+
         return cursor;
     }
 
@@ -130,6 +135,9 @@ public class ProductProvider extends ContentProvider {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
         }
+
+        // Notify all listeners that the data has changed for the pet content URI
+        getContext().getContentResolver().notifyChange(uri, null);
 
 
         // Return the new URI with the ID (of the newly inserted row) appended at the end
@@ -224,6 +232,11 @@ public class ProductProvider extends ContentProvider {
         // Perform the update on the database and get the number of rows affected
         int rowsUpdated = database.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
 
+        // If 1 or more rows were updated, then notify all listeners that the data at the
+        // given URI has changed
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
 
 
         // Return the number of rows updated
